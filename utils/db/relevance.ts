@@ -13,7 +13,7 @@ export interface DbHunks {
 	repo_provider: string,
 	repo_owner: string,
 	repo_name: string,
-	pr_number: string,
+	review_id: string,
 	author: string,
 	hunks: {
 		blamevec: HunkInfo[]
@@ -59,16 +59,17 @@ export const getHunkData = async (provider: string, owner: string, repoName: str
 	reviewId: string, userEmails: Set<string>) => {
 	const hunk_query = `
 		SELECT author, hunks 
-		FROM pr_hunks
+		FROM hunks
 		WHERE repo_provider = '${provider}' 
 		AND repo_owner = '${owner}'
 		AND repo_name = '${repoName}'  
-		AND pr_number = '${reviewId}'
+		AND review_id = '${reviewId}'
 	`;
 	const result = await conn.query<DbHunks>(hunk_query).catch(err => {
 		console.error(`[getHunkData] Unable to get author and hunks from db for review-id ${reviewId} in the repository: ${provider}/${owner}/${repoName}`, { pg_query: hunk_query }, err);
 		throw new Error("Unable to proceed without hunk data from db", err);
 	});
+	console.info(`[getHunkData] Getting hunk data for review ${reviewId} and ${result.rows}`);
 	const author_aliases = await getAuthorAliases(result.rows[0]["author"]).catch(err => {
 		console.error(`[getHunkData] Failed to get author aliases from db of the user with email ${result.rows[0]["author"]}`, err);
 		return [result.rows[0]["author"]];
@@ -82,8 +83,8 @@ export const getHunkData = async (provider: string, owner: string, repoName: str
 
 export const getReviewData = async (provider: string, owner: string, repoName: string, user_emails: Set<string>) => {
 	const review_query = `
-	SELECT pr_number, author, hunks 
-	FROM pr_hunks
+	SELECT review_id, author, hunks 
+	FROM hunks
 	WHERE repo_provider = '${provider}' 
 	AND repo_owner = '${owner}'
 	AND repo_name = '${repoName}'  
@@ -102,7 +103,7 @@ export const getReviewData = async (provider: string, owner: string, repoName: s
 			return (!(author_aliases.includes(hunk_author)) && user_emails.has(hunk_author));
 		});
 		const reviewData = {
-			review_id: row["pr_number"].toString(),
+			review_id: row["review_id"].toString(),
 			blamevec: filteredBlamevec
 		}
 		return reviewData;
