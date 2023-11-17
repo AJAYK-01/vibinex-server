@@ -92,6 +92,7 @@ export const getReviewData = async (provider: string, owner: string, repoName: s
 	});
 	console.info(`[getReviewData] Getting review data ${result.rows}`);
 	const filteredRows = result.rows.map(async (row) => {
+		console.log("[getReviewData] hunks: ", JSON.stringify(row["hunks"]));
 		const filteredBlamevec = row["hunks"]["blamevec"].filter((obj: HunkInfo) => {
 			const hunk_author = obj["author"].toString();
 			return user_emails.has(hunk_author);
