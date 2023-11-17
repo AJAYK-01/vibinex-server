@@ -63,7 +63,7 @@ export const getHunkData = async (provider: string, owner: string, repoName: str
 		WHERE repo_provider = '${provider}' 
 		AND repo_owner = '${owner}'
 		AND repo_name = '${repoName}'  
-		AND review_id = '${reviewId}'
+		AND pr_number = '${reviewId}'
 	`;
 	const result = await conn.query<DbHunks>(hunk_query).catch(err => {
 		console.error(`[getHunkData] Unable to get author and hunks from db for review-id ${reviewId} in the repository: ${provider}/${owner}/${repoName}`, { pg_query: hunk_query }, err);
