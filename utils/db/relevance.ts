@@ -74,6 +74,7 @@ export const getHunkData = async (provider: string, owner: string, repoName: str
 		const hunk_author = obj["author"];
 		return userEmails.has(hunk_author);
 	});
+	console.log(`[getHunkData] Filtered blamevec:`, filteredBlamevec);
 	return filteredBlamevec;
 }
 
@@ -89,6 +90,7 @@ export const getReviewData = async (provider: string, owner: string, repoName: s
 		console.error(`[getReviewData] Could not get hunks for repository: ${provider}/${owner}/${repoName}`, { pg_query: review_query }, err);
 		throw new Error("Error in running the query on the database", err);
 	});
+	console.info(`[getReviewData] Getting review data ${result.rows}`);
 	const filteredRows = result.rows.map(async (row) => {
 		const filteredBlamevec = row["hunks"]["blamevec"].filter((obj: HunkInfo) => {
 			const hunk_author = obj["author"].toString();
@@ -100,6 +102,7 @@ export const getReviewData = async (provider: string, owner: string, repoName: s
 		}
 		return reviewData;
 	});
+	console.log(`[getReviewData] Filtered rows for ${provider}/${owner}/${repoName}`, filteredRows);
 	return filteredRows;
 }
 
