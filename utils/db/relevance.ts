@@ -13,7 +13,7 @@ export interface DbHunks {
 	repo_provider: string,
 	repo_owner: string,
 	repo_name: string,
-	review_id: string,
+	pr_number: string,
 	author: string,
 	hunks: {
 		blamevec: HunkInfo[]
@@ -98,7 +98,7 @@ export const getReviewData = async (provider: string, owner: string, repoName: s
 			return user_emails.has(hunk_author);
 		});
 		const reviewData = {
-			review_id: row["review_id"].toString(),
+			review_id: row["pr_number"].toString(),
 			blamevec: filteredBlamevec
 		}
 		return reviewData;
